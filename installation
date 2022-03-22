@@ -1,0 +1,281 @@
+Install Asterisk 18 LTS on Ubuntu 22.04|20.04|18.04
+ByJosphat Mutai-February 17, 2022412065
+Asterisk is a free and open source framework created by Sangoma for building communications applications both for small companies and for large scale use cases. Asterisk is a software based solution which turns your Old computer into a communications server that powers IP PBX systems, VoIP gateways, conference servers and other custom solutions. The solutions build by Asterisk powers call centers, carriers and government agencies worldwide.
+
+In this blog post we’ll walk though the installation of Asterisk 18 LTS on Ubuntu 22.04|20.04|18.04 server. As of this writing the latest release of Asterisk is 18. Also note this is not a long term release and should not be used for production deployments that need Digium support for long years.
+
+
+Some key points about Asterisk are:
+
+It is written in the C Programming Language
+It is written to run on Linux and other types of Unix
+It powers Business Telephone Systems
+It connects many different Telephony protocols
+It is a toolkit for building IP PBX with many powerful features and applications , VoIP Gateways and Conferencing systems
+Has support for VoIP Phones as well as PSTN and POTS  
+It uses SIP , the most common VoIP protocol, among others
+Install Asterisk 18 LTS on Ubuntu 22.04|20.04|18.04
+You’ll follow the steps in the next sections to install Asterisk 18 on Ubuntu Linux system. Since Asterisk is created to be modular, adding extra features after installation is not a difficult process. It can be easily done.
+
+
+Step 1: Update Ubuntu System
+We’ll start our installation by updating our APT package index and upgrading all packages installed on the system. I recommend you perform this installation in a new system to avoid any issues with running services.
+
+sudo apt update
+sudo apt -y upgrade
+If the upgrade process was successful you reboot if this is a requirement:
+
+
+[ -f /var/run/reboot-required ] && sudo reboot -f
+Step 2: Install Build Dependencies
+After system is rebooted login and install all dependencies required to build Asterisk on Ubuntu Linux machine.
+
+sudo apt update
+sudo add-apt-repository universe
+sudo apt -y install git curl wget libnewt-dev libssl-dev libncurses5-dev subversion libsqlite3-dev build-essential libjansson-dev libxml2-dev  uuid-dev
+The installation should only take few minutes if you have a decent internet connection.
+
+Step 3: Download Asterisk 18 tarball
+You won’t find the latest release of Asterisk in the official system repositories. We’ll have to manually download the tarball and build the application from source.
+
+For example, on Ubuntu 20.04, the version available in APT repositories is 16.
+
+$ sudo apt policy asterisk
+asterisk:
+  Installed: (none)
+  Candidate: 1:16.2.1~dfsg-2ubuntu1
+  Version table:
+     1:16.2.1~dfsg-2ubuntu1 500
+        500 http://archive.ubuntu.com/ubuntu focal/universe amd64 Packages
+        500 http://mirror.hetzner.de/ubuntu/packages focal/universe amd64 Packages
+Use wget command to download archive file.
+
+cd ~
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
+Extract the file with tar.
+
+tar xvf asterisk-18-current.tar.gz
+Run the following command to download the mp3 decoder library into the source tree.
+
+
+cd asterisk-18*/
+contrib/scripts/get_mp3_source.sh
+Expected command execution output:
+
+A    addons/mp3
+A    addons/mp3/MPGLIB_README
+A    addons/mp3/common.c
+A    addons/mp3/huffman.h
+A    addons/mp3/tabinit.c
+A    addons/mp3/Makefile
+A    addons/mp3/README
+A    addons/mp3/decode_i386.c
+A    addons/mp3/dct64_i386.c
+A    addons/mp3/MPGLIB_TODO
+A    addons/mp3/mpg123.h
+A    addons/mp3/layer3.c
+A    addons/mp3/mpglib.h
+A    addons/mp3/decode_ntom.c
+A    addons/mp3/interface.c
+Exported revision 202.
+Ensure all dependencies are resolved:
+
+sudo contrib/scripts/install_prereq install
+You should get a success message at the end:
+
+#############################################
+## install completed successfully
+#############################################
+Step 4: Build and Install Asterisk 18 on Ubuntu 22.04|20.04|18.04
+After installation of dependencies you should be ready to build Asterisk 18 from the source we downloaded.
+
+Run the configure script to satisfy build dependencies.
+
+./configure
+A success should have an output like below:
+
+.....
+configure: creating ./config.status
+config.status: creating makeopts
+config.status: creating autoconfig.h
+configure: Menuselect build configuration successfully completed
+
+               .$$$$$$$$$$$$$$$=..
+            .$7$7..          .7$$7:.
+          .$$:.                 ,$7.7
+        .$7.     7$$$$           .$$77
+     ..$$.       $$$$$            .$$$7
+    ..7$   .?.   $$$$$   .?.       7$$$.
+   $.$.   .$$$7. $$$$7 .7$$$.      .$$$.
+ .777.   .$$$$$$77$$$77$$$$$7.      $$$,
+ $$$~      .7$$$$$$$$$$$$$7.       .$$$.
+.$$7          .7$$$$$$$7:          ?$$$.
+$$$          ?7$$$$$$$$$$I        .$$$7
+$$$       .7$$$$$$$$$$$$$$$$      :$$$.
+$$$       $$$$$$7$$$$$$$$$$$$    .$$$.
+$$$        $$$   7$$$7  .$$$    .$$$.
+$$$$             $$$$7         .$$$.
+7$$$7            7$$$$        7$$$
+ $$$$$                        $$$
+  $$$$7.                       $$  (TM)
+   $$$$$$$.           .7$$$$$$  $$
+     $$$$$$$$$$$$7$$$$$$$$$.$$$$$$
+       $$$$$$$$$$$$$$$$.
+
+configure: Package configured for:
+configure: OS type  : linux-gnu
+configure: Host CPU : x86_64
+configure: build-cpu:vendor:os: x86_64 : pc : linux-gnu :
+configure: host-cpu:vendor:os: x86_64 : pc : linux-gnu :
+Setup menu options by running the following command:
+
+make menuselect
+Use arrow keys to navigate, and Enter key to select.
+
+Select Addons to enable.
+
+install asterisk ubuntu 18.04 01 min
+Enable Core sound modules you want to use.
+
+install asterisk ubuntu 18.04 02 min
+You can also add additional MOH packages you want to use.
+
+install asterisk ubuntu 18.04 03 min
+Do the same for Extra Sound Packages.
+
+install asterisk ubuntu 18.04 04 min
+You can also go through the other menus and select options you see fit for your use case.
+
+When done run the following command to build Asterisk 18 on Ubuntu 22.04|20.04|18.04.
+
+make
+Here is my successful build output:
+
+.....
+TROLEnc.o ooh323cDriver.o -> chan_ooh323.so
+   [CC] format_mp3.c -> format_mp3.o
+   [CC] mp3/common.c -> mp3/common.o
+   [CC] mp3/dct64_i386.c -> mp3/dct64_i386.o
+   [CC] mp3/decode_ntom.c -> mp3/decode_ntom.o
+   [CC] mp3/layer3.c -> mp3/layer3.o
+   [CC] mp3/tabinit.c -> mp3/tabinit.o
+   [CC] mp3/interface.c -> mp3/interface.o
+   [LD] format_mp3.o mp3/common.o mp3/dct64_i386.o mp3/decode_ntom.o mp3/layer3.o mp3/tabinit.o mp3/interface.o -> format_mp3.so
+   [CC] res_config_mysql.c -> res_config_mysql.o
+   [LD] res_config_mysql.o -> res_config_mysql.so
+Building Documentation For: third-party channels pbx apps codecs formats cdr cel bridges funcs tests main res addons
+ +--------- Asterisk Build Complete ---------+
+ + Asterisk has successfully been built, and +
+ + can be installed by running:              +
+ +                                           +
+ +                make install               +
+ +-------------------------------------------+
+This is the command you’ll run to install Asterisk 18 on Ubuntu:
+
+sudo make install
+Sample output:
+
+....
+make[1]: Entering directory '/home/jkmutai/asterisk-18.1.1/sounds'
+make[1]: Leaving directory '/home/jkmutai/asterisk-18.1.1/sounds'
+find rest-api -name "*.json" | while read x; do \
+	/usr/bin/install -c -m 644 $x "/var/lib/asterisk/rest-api" ; \
+done
+ +---- Asterisk Installation Complete -------+
+ +                                           +
+ +    YOU MUST READ THE SECURITY DOCUMENT    +
+ +                                           +
+ + Asterisk has successfully been installed. +
+ + If you would like to install the sample   +
+ + configuration files (overwriting any      +
+ + existing config files), run:              +
+ +                                           +
+ + For generic reference documentation:      +
+ +    make samples                           +
+ +                                           +
+ + For a sample basic PBX:                   +
+ +    make basic-pbx                         +
+ +                                           +
+ +                                           +
+ +-----------------  or ---------------------+
+ +                                           +
+ + You can go ahead and install the asterisk +
+ + program documentation now or later run:   +
+ +                                           +
+ +               make progdocs               +
+ +                                           +
+ + **Note** This requires that you have      +
+ + doxygen installed on your local system    +
+ +-------------------------------------------+
+You can optionally install documentation:
+
+sudo make progdocs
+Install configs and samples.
+
+sudo make samples
+sudo make config
+sudo ldconfig
+For a sample basic PBX:
+
+sudo make basic-pbx
+Step 5: Start Asterisk Service on Ubuntu 22.04|20.04|18.04
+Create a separate user and group to run asterisk services, and assign correct permissions:
+
+sudo groupadd asterisk
+sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
+sudo usermod -aG audio,dialout asterisk
+sudo chown -R asterisk.asterisk /etc/asterisk
+sudo chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
+sudo chown -R asterisk.asterisk /usr/lib/asterisk
+sudo chmod -R 750 /var/{lib,log,run,spool}/asterisk /usr/lib/asterisk /etc/asterisk
+Set Asterisk default user to asterisk:
+
+$ sudo vim /etc/default/asterisk
+#Uncomment AST_USER and AST_GROUP to look like below
+AST_USER="asterisk"
+AST_GROUP="asterisk"
+
+$ sudo vim /etc/asterisk/asterisk.conf
+runuser = asterisk ; The user to run as.
+rungroup = asterisk ; The group to run as.
+Restart asterisk service after making the changes:
+
+sudo systemctl restart asterisk
+Enable asterisk service to start on system  boot:
+
+sudo systemctl enable asterisk
+Check service status to see if it is running.
+
+$ systemctl status asterisk
+● asterisk.service - LSB: Asterisk PBX
+     Loaded: loaded (/etc/init.d/asterisk; generated)
+     Active: active (running) since Fri 2020-08-14 12:04:41 CEST; 9s ago
+       Docs: man:systemd-sysv-generator(8)
+      Tasks: 82 (limit: 4567)
+     Memory: 44.6M
+     CGroup: /system.slice/asterisk.service
+             └─54142 /usr/sbin/asterisk -U asterisk -G asterisk
+Verify you can connect to Asterisk Command Line interface.
+
+$ sudo asterisk -rvv
+ Asterisk 18.10.0, Copyright (C) 1999 - 2021, Sangoma Technologies Corporation and others.
+ Created by Mark Spencer markster@digium.com
+ Asterisk comes with ABSOLUTELY NO WARRANTY; type 'core show warranty' for details.
+ This is free software, with components licensed under the GNU General Public
+ License version 2 and other licenses; you are welcome to redistribute it under
+ certain conditions. Type 'core show license' for details.
+ Running as user 'asterisk'
+ Running under group 'asterisk'
+ Connected to Asterisk 18.1.1 currently running on asterisk (pid = 107650)
+ asterisk*CLI> exit
+Asterisk cleanly ending (0).
+Executing last minute cleanups
+If you have an active ufw firewall, open http ports and ports 5060,5061:
+
+sudo ufw allow proto tcp from any to any port 5060,5061
+You now have Asterisk 18 installed and working on Ubuntu 22.04|20.04|18.04 Linux server.
+
+More guides on VoIP.
+
+Secure Asterisk and FreePBX from VoIP Fraud and Brute force attacks
+How To Install FreeSwitch PBX on Ubuntu
